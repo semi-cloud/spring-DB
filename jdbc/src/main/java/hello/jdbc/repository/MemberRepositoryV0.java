@@ -64,6 +64,47 @@ public class MemberRepositoryV0 {
         }
     }
 
+    public void update(String memberId, int money) throws SQLException {
+        String sql = "update member set money=? where member_id=?";
+
+        Connection con = null;
+        PreparedStatement pState = null;
+
+        try {
+            con = getConnection();
+            pState = con.prepareStatement(sql);
+            pState.setInt(1, money);
+            pState.setString(2, memberId);
+            int resultSize = pState.executeUpdate();  // 쿼리 실행 후 영향받은 row 개수 반환
+            log.info("resultSize={}", resultSize);
+        } catch (SQLException e) {
+            log.error("db error", e);
+            throw e;
+        } finally {
+            close(con, pState, null);
+        }
+    }
+
+    public void delete(String memberId) throws SQLException {
+        String sql = "delete from member where member_id=?";
+
+        Connection con = null;
+        PreparedStatement pState = null;
+
+        try {
+            con = getConnection();
+            pState = con.prepareStatement(sql);
+            pState.setString(1, memberId);
+            int resultSize = pState.executeUpdate();  // 쿼리 실행 후 영향받은 row 개수 반환
+            log.info("resultSize={}", resultSize);
+        } catch (SQLException e) {
+            log.error("db error", e);
+            throw e;
+        } finally {
+            close(con, pState, null);
+        }
+    }
+
     private void close(Connection c, Statement s, ResultSet r) {
         // 리소스 정리는 생성의 역순으로 진행
         if (s != null) {
