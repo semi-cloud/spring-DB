@@ -19,6 +19,10 @@ class MemberRepositoryV1Test {
 
     MemberRepositoryV1 repository;
 
+    /**
+     * DriverManager 에서 HikariDataSource로 바꿔도
+     * DataSource로 추상화 되어있으므로 MemberRepository 코드에는 변경이 없다.
+     */
     @BeforeEach
     void beforeEach() {
         // 기본 DriverManager -  항상 새로운 커넥션 획득(커넥션 풀 X)
