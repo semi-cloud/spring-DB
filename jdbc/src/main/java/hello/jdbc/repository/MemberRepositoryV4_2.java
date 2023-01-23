@@ -1,7 +1,6 @@
 package hello.jdbc.repository;
 
 import hello.jdbc.domain.Member;
-import hello.jdbc.repository.exception.MyDbException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
