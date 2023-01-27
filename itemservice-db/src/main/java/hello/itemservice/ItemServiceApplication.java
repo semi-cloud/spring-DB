@@ -11,7 +11,8 @@ import org.springframework.context.annotation.Profile;
 
 // @Import(MemoryConfig.class)   // 설정 파일을 스프링 빈으로 등록
 //@Import(JdbcTemplateV1Config.class)
-@Import(JdbcTemplateV2Config.class)
+//@Import(JdbcTemplateV2Config.class)
+@Import(JdbcTemplateV3Config.class)
 @SpringBootApplication(scanBasePackages = "hello.itemservice.web")  // controller만 컴포넌트 스캔
 public class ItemServiceApplication {
 

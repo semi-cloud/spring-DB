@@ -17,6 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * JdbcTemplate
+ *
+ * : 순서 기반 파라미터 바인딩 지원
+ */
 @Slf4j
 public class JdbcTemplateItemRepositoryV1 implements ItemRepository {
     private final JdbcTemplate template;
