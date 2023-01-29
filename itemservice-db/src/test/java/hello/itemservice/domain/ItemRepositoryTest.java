@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Transactional
+@Transactional  // 테스트는 커밋하지 않고 롤백 하기 때문에 JPA Update 쿼리가 보이지 X (flush=commmit 해야함)
 @SpringBootTest // @SpringBootApplication 찾아서 설정을 그대로 적용
 class ItemRepositoryTest {
 
