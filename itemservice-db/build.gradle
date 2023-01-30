@@ -8,6 +8,8 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+ext ["hibernate.version"] = "5.6.5.Final"  // 버전 변경 방법
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
