@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.UnexpectedRollbackException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -93,6 +94,26 @@ class MemberServiceTest {
         String username = "로그예외_outer_tx_on_fail";
         assertThatThrownBy(() -> memberService.joinV1(username))  // 예외를 잡지 않고 계속 던졌으니 런타임 예외 발생
                 .isInstanceOf(RuntimeException.class);
+
+        Assertions.assertTrue(memberRepository.find(username).isEmpty());
+        Assertions.assertTrue(logRepository.find(username).isEmpty());
+    }
+
+    /**
+     * 5.트랜잭션 전파 : 롤백
+     * => 요구 사항 추가 : 회원 가입 시도 로그는 실패하더라도 가입은 완료되어야 함
+     * => 멤버 로직은 정상 커밋, 로그 로직에서 올라온 예외는 서비스에서 잡아서 정상흐름으로 반환했으니 멤버는 그대로 정상 커밋될 것처럼 기대
+     * => 하지만 정상 흐름이니 외부 트랜잭션에서 커밋을 호출하고, 커밋 시점에 rollbackOnly 옵션을 체크하는데 이때 롤백을 수행해서 회원 데이터 X
+     * => 이렇게 내부 트랜잭션 롤백 + 외부 트랜잭션 커밋의 경우 트랜잭션 매니저는 UnexpectedRollbackException 예외를 던짐
+     * MemberService    @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository    @Transactional:ON
+     */
+    @Test
+    void recover_exception_fail() {
+        String username = "로그예외_recover_exception_fail";
+        assertThatThrownBy(() -> memberService.joinV2(username))
+                .isInstanceOf(UnexpectedRollbackException.class);
 
         Assertions.assertTrue(memberRepository.find(username).isEmpty());
         Assertions.assertTrue(logRepository.find(username).isEmpty());
