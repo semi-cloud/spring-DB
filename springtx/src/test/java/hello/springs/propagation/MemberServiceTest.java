@@ -100,7 +100,7 @@ class MemberServiceTest {
     }
 
     /**
-     * 5.트랜잭션 전파 : 롤백
+     * 6.트랜잭션 예외 복구 : 실패
      * => 요구 사항 추가 : 회원 가입 시도 로그는 실패하더라도 가입은 완료되어야 함
      * => 멤버 로직은 정상 커밋, 로그 로직에서 올라온 예외는 서비스에서 잡아서 정상흐름으로 반환했으니 멤버는 그대로 정상 커밋될 것처럼 기대
      * => 하지만 정상 흐름이니 외부 트랜잭션에서 커밋을 호출하고, 커밋 시점에 rollbackOnly 옵션을 체크하는데 이때 롤백을 수행해서 회원 데이터 X
@@ -116,6 +116,23 @@ class MemberServiceTest {
                 .isInstanceOf(UnexpectedRollbackException.class);
 
         Assertions.assertTrue(memberRepository.find(username).isEmpty());
+        Assertions.assertTrue(logRepository.find(username).isEmpty());
+    }
+
+    /**
+     * 7.트랜잭션 예외 복구 : 성공
+     * => REQUIRES_NEW 는 항상 신규 트랜잭션(커넥션)을 생성해서 분리되므로, 로그 로직에서 예외가 터져도 rollbackOnly 옵션 설정 되지 X
+     * => 서비스에서는 그대로 던져진 런타임 예외를 잡고 정상 흐름이므로 실제 물리 트랜잭션 커밋이 일어남
+     * => Member 정상 저장, Log 예외로 인해 롤백
+     * MemberService    @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository    @Transactional:ON(REQUIRES_NEW) Exception
+     */
+    @Test
+    void recover_exception_success() {
+        String username = "로그예외_recover_exception_success";
+        memberService.joinV2(username);
+        Assertions.assertTrue(memberRepository.find(username).isPresent());
         Assertions.assertTrue(logRepository.find(username).isEmpty());
     }
 }
