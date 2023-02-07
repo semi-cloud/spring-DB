@@ -65,4 +65,36 @@ class MemberServiceTest {
         Assertions.assertTrue(memberRepository.find(username).isPresent());
         Assertions.assertTrue(logRepository.find(username).isPresent());
     }
+
+    /**
+     * 4.트랜잭션 전파 : 커밋
+     * MemberService    @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository    @Transactional:ON
+     */
+    @Test
+    void outer_tx_on_success() {
+        String username = "outer_tx_on_success";
+        memberService.joinV1(username);
+        Assertions.assertTrue(memberRepository.find(username).isPresent());
+        Assertions.assertTrue(logRepository.find(username).isPresent());
+    }
+
+
+    /**
+     * 5.트랜잭션 전파 : 롤백
+     * => 외부 트랜잭션(물리)이 롤백되면서 모든 데이터가 롤백(단, rollbackOnly에 상관 없이 예외 발생했으므로 롤백)
+     * MemberService    @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository    @Transactional:ON
+     */
+    @Test
+    void outer_tx_on_fail() {
+        String username = "로그예외_outer_tx_on_fail";
+        assertThatThrownBy(() -> memberService.joinV1(username))  // 예외를 잡지 않고 계속 던졌으니 런타임 예외 발생
+                .isInstanceOf(RuntimeException.class);
+
+        Assertions.assertTrue(memberRepository.find(username).isEmpty());
+        Assertions.assertTrue(logRepository.find(username).isEmpty());
+    }
 }
